@@ -7,6 +7,7 @@ import com.parqueadero.parking_api.entity.Vehicle;
 import com.parqueadero.parking_api.enums.ParkingStatus;
 import com.parqueadero.parking_api.repository.ParkingRecordRepository;
 import com.parqueadero.parking_api.repository.VehicleRepository;
+import com.parqueadero.parking_api.service.EmailService;
 import com.parqueadero.parking_api.service.ParkingService;
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class ParkingServiceImpl implements ParkingService{
 	 private final VehicleRepository vehicleRepository;
 	    private final ParkingRecordRepository parkingRecordRepository;
-
+	    private final EmailService emailService;
 	    private static final BigDecimal RATE_PER_MINUTE =
 	            BigDecimal.valueOf(50);
 
@@ -77,8 +78,16 @@ public class ParkingServiceImpl implements ParkingService{
 	        record.setTotalMinutes(minutes);
 	        record.setTotalAmount(total);
 	        record.setStatus(ParkingStatus.EXITED);
-
+	        try {
+	            emailService.sendExitEmail(record);
+	            System.out.println("MAIL OK");
+	            record.setEmailSent(true);
+	        } catch (Exception e) {
+	        	System.out.println("ERROR" + e.getMessage());
+	            record.setEmailSent(false);
+	        }
 	        parkingRecordRepository.save(record);
+	        System.out.println("GUARDADO");
 
 	        return ExitResponse.builder()
 	                .plate(vehicle.getPlate())

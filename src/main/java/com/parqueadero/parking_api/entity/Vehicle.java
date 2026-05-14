@@ -1,5 +1,6 @@
 package com.parqueadero.parking_api.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.parqueadero.parking_api.enums.VehicleType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,7 +29,7 @@ public class Vehicle {
 
 	    @Column(nullable = false)
 	    private LocalDateTime createdAt;
-
+	    @JsonIgnore
 	    @OneToMany(mappedBy = "vehicle")
 	    private List<ParkingRecord> parkingRecords;
 
